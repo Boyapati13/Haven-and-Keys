@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useDropzone } from 'react-dropzone'
+import { useDropzone, type FileRejection } from 'react-dropzone'
 import { Button } from '@/components/ui/Button'
 import type { DocType } from '@/types'
 
@@ -24,10 +24,10 @@ export function IDUploadGate({ token, onVerified }: IDUploadGateProps) {
   const [uploading, setUploading] = useState(false)
   const [error,     setError]     = useState<string | null>(null)
 
-  const onDrop = useCallback((accepted: File[], rejected: { errors: { code: string }[] }[]) => {
+  const onDrop = useCallback((accepted: File[], rejected: FileRejection[]) => {
     setError(null)
     if (rejected.length > 0) {
-      const code = rejected[0]?.errors[0]?.code
+      const code = rejected[0]?.errors[0]?.code as string | undefined
       setError(
         code === 'file-too-large'
           ? 'File too large — maximum 10 MB.'

@@ -1,6 +1,5 @@
-import type { NextConfig } from 'next'
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -10,8 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Required: Stripe and Hostaway webhook handlers need the raw body
-  // This is handled via the route config (no global bodyParser disable needed in App Router)
   experimental: {
     serverComponentsExternalPackages: ['twilio'],
   },
