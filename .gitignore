@@ -44,3 +44,6 @@ yarn-error.log*
 .vscode/*.code-snippets
 *.swp
 *.swo
+
+# Nested repo clone (stale duplicate — delete manually if present)
+Haven-and-Keys/

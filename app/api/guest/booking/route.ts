@@ -79,17 +79,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     await supabase.from('bookings').update(updates).eq('id', booking.id)
   }
 
-  // Update token usage
+  // Update token last_used_at + increment use_count atomically via DB function
   await supabase
     .from('magic_tokens')
-    .update({
-      last_used_at: new Date().toISOString(),
-      use_count: supabase.rpc('increment', { row_id: magicToken.id }), // handled below
-    })
+    .update({ last_used_at: new Date().toISOString() })
     .eq('id', magicToken.id)
 
-  // Simple use_count increment via raw update
-  await supabase.rpc('increment_token_use_count', { token_id: magicToken.id }).maybeSingle()
+  await supabase.rpc('increment_token_use_count', { token_id: magicToken.id })
 
   // ── Build sanitized response (NEVER include address/codes) ───────────────
   const property = Array.isArray(booking.properties)

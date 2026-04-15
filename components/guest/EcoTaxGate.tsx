@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { formatCurrency } from '@/lib/utils'
 
 interface EcoTaxGateProps {
   token: string
@@ -13,28 +13,13 @@ interface EcoTaxGateProps {
   nights: number
 }
 
-function formatCurrency(cents: number, currency: string): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-    minimumFractionDigits: 2,
-  }).format(cents / 100)
-}
-
-export function EcoTaxGate({
-  token,
-  amountCents,
-  currency,
-  propertyName,
-  nights,
-}: EcoTaxGateProps) {
+export function EcoTaxGate({ token, amountCents, currency, propertyName, nights }: EcoTaxGateProps) {
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState<string | null>(null)
+  const [error,   setError]   = useState<string | null>(null)
 
-  async function handlePayment() {
+  async function handlePay() {
     setLoading(true)
     setError(null)
-
     try {
       const res  = await fetch('/api/guest/initiate-payment', {
         method: 'POST',
@@ -42,16 +27,10 @@ export function EcoTaxGate({
         body: JSON.stringify({ token }),
       })
       const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error ?? 'Failed to initiate payment. Please try again.')
-        return
-      }
-
-      // Redirect to Stripe Checkout
+      if (!res.ok) { setError(data.error ?? 'Failed to initiate payment.'); return }
       window.location.href = data.checkoutUrl
     } catch {
-      setError('A network error occurred. Please check your connection and try again.')
+      setError('Network error. Please check your connection.')
     } finally {
       setLoading(false)
     }
@@ -59,61 +38,63 @@ export function EcoTaxGate({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 0.5, ease: [0.34, 1.1, 0.64, 1] }}
     >
-      <Card>
-        <CardHeader
-          title="Eco Tourism Tax"
-          subtitle="Required before accessing your property details"
-          icon={<span className="text-haven-gold text-lg">🌿</span>}
-        />
-
-        {/* Amount display */}
-        <div className="glass-gold rounded-2xl p-5 mb-5 text-center">
-          <p className="text-haven-muted text-xs uppercase tracking-wider mb-1">Amount Due</p>
-          <p className="font-display text-4xl text-haven-gold font-semibold">
-            {formatCurrency(amountCents, currency)}
-          </p>
-          <p className="text-haven-muted/70 text-xs mt-1">
-            {propertyName} · {nights} night{nights !== 1 ? 's' : ''}
-          </p>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-11 h-11 rounded-2xl bg-haven-gold/10 border border-haven-gold/20 flex items-center justify-center flex-shrink-0">
+          <span className="text-xl">🌿</span>
         </div>
-
-        {/* Info */}
-        <div className="space-y-2 mb-6">
-          {[
-            'Mandatory local regulation for short-term rentals',
-            'Secure payment powered by Stripe',
-            'One-time charge for your entire stay',
-          ].map((item) => (
-            <div key={item} className="flex items-start gap-2.5">
-              <span className="text-haven-success text-sm mt-0.5 flex-shrink-0">✓</span>
-              <p className="text-haven-muted text-sm">{item}</p>
-            </div>
-          ))}
+        <div>
+          <h2 className="text-haven-text font-semibold text-base">Eco Tourism Tax</h2>
+          <p className="text-haven-muted text-xs mt-0.5">Required to unlock your property access</p>
         </div>
+      </div>
 
-        {error && (
-          <div className="bg-haven-error/10 border border-haven-error/30 rounded-xl px-4 py-3 mb-4">
-            <p className="text-haven-error text-sm">{error}</p>
-          </div>
-        )}
-
-        <Button
-          fullWidth
-          size="lg"
-          loading={loading}
-          onClick={handlePayment}
-        >
-          Pay {formatCurrency(amountCents, currency)} Securely
-        </Button>
-
-        <p className="text-haven-muted/50 text-xs text-center mt-3">
-          You will be redirected to Stripe. Your card details are never stored by us.
+      {/* Amount card */}
+      <div className="rounded-3xl border border-haven-gold/25 bg-haven-gold/5 p-6 text-center mb-5">
+        <p className="text-haven-muted/60 text-[10px] uppercase tracking-widest mb-2">Amount Due</p>
+        <p className="font-display text-5xl font-semibold text-haven-gold leading-none">
+          {formatCurrency(amountCents, currency)}
         </p>
-      </Card>
+        <p className="text-haven-muted/50 text-xs mt-3">
+          {propertyName} &middot; {nights} night{nights !== 1 ? 's' : ''}
+        </p>
+      </div>
+
+      {/* Trust bullets */}
+      <div className="space-y-2.5 mb-6">
+        {[
+          { icon: '⚖️', text: 'Mandatory local regulation for short-term rentals' },
+          { icon: '🔒', text: 'Secure checkout powered by Stripe' },
+          { icon: '✓',  text: 'One-time charge covering your entire stay' },
+        ].map(({ icon, text }) => (
+          <div key={text} className="flex items-start gap-3">
+            <span className="text-sm w-5 flex-shrink-0 text-center">{icon}</span>
+            <p className="text-haven-muted text-sm leading-snug">{text}</p>
+          </div>
+        ))}
+      </div>
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-haven-error/10 border border-haven-error/30 rounded-2xl px-4 py-3 mb-4"
+        >
+          <p className="text-haven-error text-sm">{error}</p>
+        </motion.div>
+      )}
+
+      <Button fullWidth size="lg" loading={loading} onClick={handlePay}>
+        Pay {formatCurrency(amountCents, currency)} Securely
+      </Button>
+
+      <p className="text-haven-muted/35 text-xs text-center mt-3 leading-relaxed">
+        You&apos;ll be redirected to Stripe. Your card details are never stored by us.
+      </p>
     </motion.div>
   )
 }
