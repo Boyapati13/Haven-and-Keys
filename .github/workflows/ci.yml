@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Type check + Build ──────────────────────────────────────────────────────
+  build:
+    name: Type Check & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Stub env vars so Next.js build doesn't fail on missing values
+      - name: Create .env for build
+        run: |
+          cat <<'EOF' > .env.local
+          NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
+          SUPABASE_SERVICE_ROLE_KEY=placeholder
+          STRIPE_SECRET_KEY=sk_test_placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+          STRIPE_WEBHOOK_SECRET=whsec_placeholder
+          TWILIO_ACCOUNT_SID=ACplaceholder
+          TWILIO_AUTH_TOKEN=placeholder
+          TWILIO_WHATSAPP_FROM=whatsapp:+15005550006
+          HOSTAWAY_WEBHOOK_SECRET=placeholder
+          PROPERTY_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000
+          NEXT_PUBLIC_APP_URL=http://localhost:3000
+          EOF
+
+      - name: TypeScript check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
+
+  # ── Lint ────────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint

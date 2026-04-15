@@ -3,16 +3,13 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
 
   "features": {
-    // Supabase CLI
-    "ghcr.io/devcontainers-contrib/features/supabase-cli:1": {},
-    // GitHub CLI
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
-  // Install dependencies on container create
-  "postCreateCommand": "npm install",
+  // 1. Install deps  2. Copy env example so the app can start
+  "postCreateCommand": "npm install && [ ! -f .env.local ] && cp .env.example .env.local || true",
 
-  // Start dev server when container is attached
+  // Auto-start dev server every time the Codespace is opened
   "postAttachCommand": {
     "dev-server": "npm run dev"
   },
@@ -35,20 +32,21 @@
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "editor.tabSize": 2,
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.eol": "\n"
       }
     }
   },
 
-  // Forward Next.js dev server port
   "forwardPorts": [3000],
   "portsAttributes": {
     "3000": {
-      "label": "HavenKey Dev Server",
-      "onAutoForward": "openBrowser"
+      "label": "HavenKey — Dev Server",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
     }
   },
 
-  // Non-root user
   "remoteUser": "node"
 }
