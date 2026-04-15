@@ -39,6 +39,8 @@ yarn-error.log*
 
 # IDE
 .idea/
-.vscode/
+# .vscode/ is committed — it contains shared workspace config (extensions, settings, launch, tasks)
+# Ignore only user-specific snippets
+.vscode/*.code-snippets
 *.swp
 *.swo

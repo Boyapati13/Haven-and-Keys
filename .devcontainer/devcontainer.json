@@ -1,0 +1,54 @@
+{
+  "name": "HavenKey Concierge",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+
+  "features": {
+    // Supabase CLI
+    "ghcr.io/devcontainers-contrib/features/supabase-cli:1": {},
+    // GitHub CLI
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // Install dependencies on container create
+  "postCreateCommand": "npm install",
+
+  // Start dev server when container is attached
+  "postAttachCommand": {
+    "dev-server": "npm run dev"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "eamodio.gitlens",
+        "mikestead.dotenv",
+        "christian-kohler.path-intellisense",
+        "dsznajder.es7-react-js-snippets",
+        "pkief.material-icon-theme",
+        "github.github-vscode-theme",
+        "visualstudioexptteam.vscodeintellicode"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  // Forward Next.js dev server port
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "HavenKey Dev Server",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // Non-root user
+  "remoteUser": "node"
+}

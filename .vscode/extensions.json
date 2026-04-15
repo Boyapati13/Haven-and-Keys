@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "eamodio.gitlens",
+    "mikestead.dotenv",
+    "christian-kohler.path-intellisense",
+    "dsznajder.es7-react-js-snippets",
+    "pkief.material-icon-theme",
+    "github.vscode-pull-request-github",
+    "github.github-vscode-theme",
+    "visualstudioexptteam.vscodeintellicode"
+  ]
+}
